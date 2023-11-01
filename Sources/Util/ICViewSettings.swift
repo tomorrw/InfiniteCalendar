@@ -38,7 +38,7 @@ public protocol ICSettings: ObservableObject {
     var timeRange: (startTime: Int, endTime: Int) { get set }
     var withVibrateFeedback: Bool { get set }
     var datePosition: ICViewUI.DatePosition { get set }
-    
+    var backgroundColor: UIColor { get set }
     /* TODO: for future
      var viewType: ViewType
      var firstDayOfWeek: DayOfWeek?
@@ -60,6 +60,7 @@ open class ICViewSettings: ICSettings {
     @Published public var timeRange: (startTime: Int, endTime: Int) = (1, 23)
     @Published public var withVibrateFeedback: Bool = true
     @Published public var datePosition: ICViewUI.DatePosition = .left
-    
+    @Published public var backgroundColor: UIColor = .systemBackground
+
     required public init() { }
 }
