@@ -62,7 +62,7 @@ public struct ICAllDayCornerItem: ICComponent {
     
     public init() {}
     
-    public init(background: Color = .white.opacity(0.0), itemCount: Int = 0, isExpended: Bool = false, toggle: ((Bool)->Void)? = nil) {
+    public init(background: Color = .white, itemCount: Int = 0, isExpended: Bool = false, toggle: ((Bool)->Void)? = nil) {
         self.background = background
         self.itemCount = itemCount
         self.isExpended = isExpended

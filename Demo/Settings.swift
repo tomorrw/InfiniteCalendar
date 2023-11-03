@@ -7,6 +7,7 @@
 
 import Foundation
 import InfiniteCalendar
+import UIKit
 
 class CustomSettings: ICSettings {
     typealias DateHeaderView = CustomDateHeaderView
@@ -19,7 +20,8 @@ class CustomSettings: ICSettings {
     @Published public var timeRange: (startTime: Int, endTime: Int) = (1, 23)
     @Published public var withVibrateFeedback: Bool = true
     @Published public var datePosition: ICViewUI.DatePosition = .left
-    
+    @Published public var backgroundColor:UIColor = .systemBackground
+
     required public init() {}
     
     init(numOfDays: Int, setDate: Date) {
