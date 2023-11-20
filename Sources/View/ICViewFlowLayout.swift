@@ -19,7 +19,7 @@ open class ICViewFlowLayout<Settings: ICSettings>: UICollectionViewFlowLayout {
     public var minuteHeight: CGFloat { return hourHeight / 60 }
     
     private var timeScale: CGFloat {
-        return  min(max(currentSettings.timeScaleRange.minScale, currentSettings.timeScale), currentSettings.timeScaleRange.maxScale)
+        return currentSettings.timeScale.clamped(to: currentSettings.timeScaleRange.minScale...currentSettings.timeScaleRange.maxScale)
     }
     /// Date header is stay on top, when its scrolling down.
     open var isStickeyDateHeader: Bool { return true }

@@ -120,11 +120,12 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
             collectionView.isScrollEnabled = false
         case .changed:
             let scale = gestureRecognizer.scale
-            let newZoom = min(max(settings.timeScaleRange.minScale, settings.timeScale / scale), settings.timeScaleRange.maxScale)
             
-            guard newZoom != settings.timeScale else { return }
+            let NewTimeScale =  (settings.timeScale / scale).clamped(to: settings.timeScaleRange.minScale...settings.timeScaleRange.maxScale)
+            
+            guard NewTimeScale != settings.timeScale else { return }
                 
-            settings.timeScale = newZoom
+            settings.timeScale = NewTimeScale
             
             let fingerLocationInContent = gestureRecognizer.location(in: collectionView).y
             let fingerOffsetInBounds = fingerLocationInContent - collectionView.contentOffset.y
