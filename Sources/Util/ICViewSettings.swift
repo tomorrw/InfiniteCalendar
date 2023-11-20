@@ -36,6 +36,8 @@ public protocol ICSettings: ObservableObject {
     var scrollType: ScrollType { get set }
     var moveTimeMinInterval: Int { get set }
     var timeRange: (startTime: Int, endTime: Int) { get set }
+    var timeScale: CGFloat { get set }
+    var timeScaleRange: (minScale: CGFloat, maxScale: CGFloat) { get set }
     var withVibrateFeedback: Bool { get set }
     var datePosition: ICViewUI.DatePosition { get set }
     var backgroundColor: UIColor { get set }
@@ -58,6 +60,8 @@ open class ICViewSettings: ICSettings {
     @Published public var scrollType: ScrollType = .pageScroll
     @Published public var moveTimeMinInterval: Int = 15
     @Published public var timeRange: (startTime: Int, endTime: Int) = (1, 23)
+    @Published public var timeScale: CGFloat = 60
+    @Published public var timeScaleRange: (minScale: CGFloat, maxScale: CGFloat) = (10,60)
     @Published public var withVibrateFeedback: Bool = true
     @Published public var datePosition: ICViewUI.DatePosition = .left
     @Published public var backgroundColor: UIColor = .systemBackground

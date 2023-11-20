@@ -28,6 +28,7 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
     public var currentLongTapType: LongTapType?
     public var longTapView: UIView?
     public var currentEditingCellInfo: CurrentEditingCellInfo?
+    public var zoom: CGFloat = 60
     
     /// AutoScroll
     public var autoScrollTimer: Timer?
@@ -109,6 +110,40 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
         let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleLongTapGesture(_:)))
         longTapGesture.delegate = self
         collectionView.addGestureRecognizer(longTapGesture)
+        let zoomGesture = UIPinchGestureRecognizer(target: self, action: #selector(self.handleZoomGesture(_:)))
+        collectionView.addGestureRecognizer(zoomGesture)
+    }
+    
+    // MARK: - Zoom
+    @objc private func handleZoomGesture(_ gestureRecognizer: UIPinchGestureRecognizer) {
+        let scale = gestureRecognizer.scale
+        var newZoom = zoom
+        var fingerYLocation = collectionView.bounds.height
+        
+        switch gestureRecognizer.state {
+        case .began:
+            collectionView.isScrollEnabled = false
+        case .changed:
+            // Modify the zoom based on the scale of the gesture
+            newZoom = zoom / scale
+            zoom = min(max(settings.timeScaleRange.minScale, newZoom), settings.timeScaleRange.maxScale)
+            if (zoom > settings.timeScaleRange.minScale && zoom < settings.timeScaleRange.maxScale){
+                //since scroll views bounds.height != contentSize.height
+                fingerYLocation = (collectionView.bounds.height * gestureRecognizer.location( in: collectionView).y / (collectionView.contentSize.height.toDecimal1Value()))
+                
+                collectionView.contentOffset.y += (collectionView.contentOffset.y + fingerYLocation ) * (1.0 - (1.0 / scale))
+                
+                settings.timeScale = zoom
+                updateLayout()
+                gestureRecognizer.scale = 1.0
+            }
+        case .ended, .cancelled:
+            newZoom = zoom
+            collectionView.isScrollEnabled = true
+            break
+            
+        default: break
+        }
     }
     
     private func checkLongTapPosition(gesture: UILongPressGestureRecognizer) -> Bool {
