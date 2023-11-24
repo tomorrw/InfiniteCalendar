@@ -121,11 +121,11 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
         case .changed:
             let scale = gestureRecognizer.scale
             
-            let NewTimeScale =  (settings.timeScale / scale).clamped(to: settings.timeScaleRange.minScale...settings.timeScaleRange.maxScale)
+            let newTimeScale =  (settings.timeScale / scale)
             
-            guard NewTimeScale != settings.timeScale else { return }
-                
-            settings.timeScale = NewTimeScale
+            if( settings.timeScaleRange.minScale > newTimeScale || settings.timeScaleRange.maxScale < newTimeScale ){ return }
+            
+            settings.timeScale = newTimeScale
             
             let fingerLocationInContent = gestureRecognizer.location(in: collectionView).y
             let fingerOffsetInBounds = fingerLocationInContent - collectionView.contentOffset.y
