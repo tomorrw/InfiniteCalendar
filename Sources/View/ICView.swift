@@ -117,13 +117,16 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
     @objc private func handleZoomGesture(_ gestureRecognizer: UIPinchGestureRecognizer) {
         switch gestureRecognizer.state {
         case .began:
+            gestureRecognizer.scale = settings.timeScale
             collectionView.isScrollEnabled = false
         case .changed:
             let scale = gestureRecognizer.scale
             
-            let newTimeScale =  (settings.timeScale / scale)
+            print(scale)
+            let newTimeScale = scale
             
-            if( settings.timeScaleRange.minScale > newTimeScale || settings.timeScaleRange.maxScale < newTimeScale ){ return }
+            if( settings.timeScaleRange.minScale > newTimeScale){ gestureRecognizer.scale = settings.timeScaleRange.minScale;  return }
+            if(settings.timeScaleRange.maxScale < newTimeScale ){ gestureRecognizer.scale = settings.timeScaleRange.maxScale; return }
             
             settings.timeScale = newTimeScale
             
@@ -131,10 +134,10 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
             let fingerOffsetInBounds = fingerLocationInContent - collectionView.contentOffset.y
             
             // updating ui
-            collectionView.contentOffset.y = fingerLocationInContent * scale - fingerOffsetInBounds
+//            collectionView.contentOffset.y = fingerLocationInContent * scale - fingerOffsetInBounds
             updateLayout()
-            gestureRecognizer.scale = 1.0
         case .ended, .cancelled:
+            gestureRecognizer.scale = settings.timeScale
             collectionView.isScrollEnabled = true
             break
         default: break

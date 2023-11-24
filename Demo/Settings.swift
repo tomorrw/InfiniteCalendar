@@ -17,8 +17,8 @@ class CustomSettings: ICSettings {
     @Published public var initDate: Date = Date()
     @Published public var scrollType: ScrollType = .pageScroll
     @Published public var moveTimeMinInterval: Int = 15
-    @Published public var timeScale: CGFloat = 60
-    @Published public var timeScaleRange: (minScale: CGFloat, maxScale: CGFloat) = (10,120)
+    @Published public var timeScale: CGFloat = 1
+    @Published public var timeScaleRange: (minScale: CGFloat, maxScale: CGFloat) = (0.5,5)
     @Published public var timeRange: (startTime: Int, endTime: Int) = (1, 23)
     @Published public var withVibrateFeedback: Bool = true
     @Published public var datePosition: ICViewUI.DatePosition = .left

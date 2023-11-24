@@ -819,13 +819,13 @@ extension ICViewFlowLayout {
 extension ICViewFlowLayout {
     // MARK: UI, Layout
     public func setupUIParams(hourHeight: CGFloat? = nil, timeHeaderWidth: CGFloat? = nil, dateHeaderHeight: CGFloat? = nil) {
-        self.hourHeight = (hourHeight ?? defaultHourHeight) * (60/CGFloat(timeScale))
+        self.hourHeight = (hourHeight ?? defaultHourHeight) *  CGFloat(timeScale)
         self.dateHeaderHeight = dateHeaderHeight ?? defaultDateHeaderHeight
         self.timeHeaderWidth = timeHeaderWidth ?? defaultTimeHeaderWidth
     }
     
     public func updateUIParams(hourHeight: CGFloat? = nil){
-        self.hourHeight = (hourHeight ?? defaultHourHeight) * (60/CGFloat(timeScale))
+        self.hourHeight = (hourHeight ?? defaultHourHeight) * CGFloat(timeScale)
     }
     
     public func initializeMinuteTick() {
