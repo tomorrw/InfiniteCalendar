@@ -44,6 +44,10 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
     
     private var isStartedLongGesture: Bool = false
     
+    /// Zoom
+    private var initialTopFingerOffsetYInContent:CGFloat = 0
+    private var initalContentHeight: CGFloat = 0
+    
     open var longTapTopMarginY: CGFloat {
         return layout.allDayHeaderHeight + (isHiddenTopDate ? 0 : layout.dateHeaderHeight)
     }
@@ -113,31 +117,44 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
         collectionView.addGestureRecognizer(zoomGesture)
     }
     
+    private func getTopFingerOffsetYInContent(_ gestureRecognizer: UIPinchGestureRecognizer) -> CGFloat {
+        if gestureRecognizer.numberOfTouches < 2 {
+            return gestureRecognizer.location(in: collectionView).y
+        }
+        return (0...1).map { gestureRecognizer.location(ofTouch: $0,in: collectionView).y }.min()!
+    }
+    
     // MARK: - Zoom
     @objc private func handleZoomGesture(_ gestureRecognizer: UIPinchGestureRecognizer) {
         switch gestureRecognizer.state {
         case .began:
             gestureRecognizer.scale = settings.timeScale
             collectionView.isScrollEnabled = false
+            initialTopFingerOffsetYInContent = getTopFingerOffsetYInContent(gestureRecognizer) / settings.timeScale
+            initalContentHeight = collectionView.contentSize.height / settings.timeScale
         case .changed:
-            let scale = gestureRecognizer.scale
+            guard gestureRecognizer.numberOfTouches == 2 else {
+                gestureRecognizer.state = .cancelled
+                return
+            }
+            settings.timeScale = gestureRecognizer.scale.clamped(to: settings.timeScaleRange)
             
-            print(scale)
-            let newTimeScale = scale
+            let fingerOffsetInBounds = collectionView.contentOffset.y - getTopFingerOffsetYInContent(gestureRecognizer)
             
-            if( settings.timeScaleRange.minScale > newTimeScale){ gestureRecognizer.scale = settings.timeScaleRange.minScale;  return }
-            if(settings.timeScaleRange.maxScale < newTimeScale ){ gestureRecognizer.scale = settings.timeScaleRange.maxScale; return }
+            let remainingSizeBellowTopFinger = (initalContentHeight - initialTopFingerOffsetYInContent) * settings.timeScale
+            let heightOfBoundsWithSafeArea = collectionView.bounds.height +  collectionView.contentInset.bottom
             
-            settings.timeScale = newTimeScale
+            collectionView.contentOffset.y = collectionView.contentSize.height - heightOfBoundsWithSafeArea
+
+            if remainingSizeBellowTopFinger < heightOfBoundsWithSafeArea/2 {
+                collectionView.contentOffset.y = collectionView.contentSize.height - heightOfBoundsWithSafeArea
+            } else {
+                collectionView.contentOffset.y = initialTopFingerOffsetYInContent * settings.timeScale + fingerOffsetInBounds
+            }
             
-            let fingerLocationInContent = gestureRecognizer.location(in: collectionView).y
-            let fingerOffsetInBounds = fingerLocationInContent - collectionView.contentOffset.y
-            
-            // updating ui
-//            collectionView.contentOffset.y = fingerLocationInContent * scale - fingerOffsetInBounds
+            ///updating UI
             updateLayout()
         case .ended, .cancelled:
-            gestureRecognizer.scale = settings.timeScale
             collectionView.isScrollEnabled = true
             break
         default: break
@@ -316,9 +333,9 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
         
         guard let info = currentEditingCellInfo, let editingView = longTapView else { return }
         let dateRange = layout.dateRange(forCell: editingView.frame,
-                                             type: currentLongTapType,
-                                             originStart: info.viewModel.startDate,
-                                             originEnd: info.viewModel.endDate)
+                                         type: currentLongTapType,
+                                         originStart: info.viewModel.startDate,
+                                         originEnd: info.viewModel.endDate)
         delegateForLongTap?.icView(self, didCancel: info.viewModel, startAt: dateRange.startDate, endAt: dateRange.endDate)
     }
     
@@ -329,9 +346,9 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
         guard var info = currentEditingCellInfo, let editingView = longTapView else { return }
         
         let dateRange = layout.dateRange(forCell: editingView.frame,
-                                             type: currentLongTapType,
-                                             originStart: info.viewModel.startDate,
-                                             originEnd: info.viewModel.endDate)
+                                         type: currentLongTapType,
+                                         originStart: info.viewModel.startDate,
+                                         originEnd: info.viewModel.endDate)
         info.viewModel.startDate = dateRange.startDate
         info.viewModel.endDate = dateRange.endDate
         
