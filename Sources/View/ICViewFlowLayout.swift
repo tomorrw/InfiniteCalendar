@@ -18,9 +18,6 @@ open class ICViewFlowLayout<Settings: ICSettings>: UICollectionViewFlowLayout {
     
     public var minuteHeight: CGFloat { return hourHeight / 60 }
     
-    private var timeScale: CGFloat {
-        return currentSettings.timeScale
-    }
     /// Date header is stay on top, when its scrolling down.
     open var isStickeyDateHeader: Bool { return true }
     
@@ -819,13 +816,9 @@ extension ICViewFlowLayout {
 extension ICViewFlowLayout {
     // MARK: UI, Layout
     public func setupUIParams(hourHeight: CGFloat? = nil, timeHeaderWidth: CGFloat? = nil, dateHeaderHeight: CGFloat? = nil) {
-        self.hourHeight = (hourHeight ?? defaultHourHeight) *  CGFloat(timeScale)
+        self.hourHeight = hourHeight ?? defaultHourHeight
         self.dateHeaderHeight = dateHeaderHeight ?? defaultDateHeaderHeight
         self.timeHeaderWidth = timeHeaderWidth ?? defaultTimeHeaderWidth
-    }
-    
-    public func updateUIParams(hourHeight: CGFloat? = nil){
-        self.hourHeight = (hourHeight ?? defaultHourHeight) * CGFloat(timeScale)
     }
     
     public func initializeMinuteTick() {
