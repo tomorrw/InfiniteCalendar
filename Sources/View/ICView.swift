@@ -153,7 +153,7 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
             }
             
             ///updating UI
-            self.layout.setupUIParams(hourHeight: self.layout.hourHeight * settings.timeScale)
+            self.layout.setupUIParams()
         case .ended, .cancelled:
             collectionView.isScrollEnabled = true
             break
