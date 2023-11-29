@@ -47,6 +47,8 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
     /// Zoom
     private var initialTopFingerOffsetYInContent:CGFloat = 0
     private var initalContentHeight: CGFloat = 0
+    var timeScale: CGFloat = 1
+    var timeScaleRange: ClosedRange<CGFloat> = (0.8...6)
     
     open var longTapTopMarginY: CGFloat {
         return layout.allDayHeaderHeight + (isHiddenTopDate ? 0 : layout.dateHeaderHeight)
@@ -114,7 +116,9 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
         longTapGesture.delegate = self
         collectionView.addGestureRecognizer(longTapGesture)
         let zoomGesture = UIPinchGestureRecognizer(target: self, action: #selector(self.handleZoomGesture(_:)))
+        zoomGesture.isEnabled = settings.isZoomable
         collectionView.addGestureRecognizer(zoomGesture)
+        
     }
     
     private func getTopFingerOffsetYInContent(_ gestureRecognizer: UIPinchGestureRecognizer) -> CGFloat {
@@ -128,20 +132,20 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
     @objc private func handleZoomGesture(_ gestureRecognizer: UIPinchGestureRecognizer) {
         switch gestureRecognizer.state {
         case .began:
-            gestureRecognizer.scale = settings.timeScale
+            gestureRecognizer.scale = timeScale
             collectionView.isScrollEnabled = false
-            initialTopFingerOffsetYInContent = getTopFingerOffsetYInContent(gestureRecognizer) / settings.timeScale
-            initalContentHeight = collectionView.contentSize.height / settings.timeScale
+            initialTopFingerOffsetYInContent = getTopFingerOffsetYInContent(gestureRecognizer) / timeScale
+            initalContentHeight = collectionView.contentSize.height / timeScale
         case .changed:
             guard gestureRecognizer.numberOfTouches == 2 else {
                 gestureRecognizer.state = .cancelled
                 return
             }
-            settings.timeScale = gestureRecognizer.scale.clamped(to: settings.timeScaleRange)
+            timeScale = gestureRecognizer.scale.clamped(to: timeScaleRange)
             
             let fingerOffsetInBounds = collectionView.contentOffset.y - getTopFingerOffsetYInContent(gestureRecognizer)
             
-            let remainingSizeBellowTopFinger = (initalContentHeight - initialTopFingerOffsetYInContent) * settings.timeScale
+            let remainingSizeBellowTopFinger = (initalContentHeight - initialTopFingerOffsetYInContent) * timeScale
             let heightOfBoundsWithSafeArea = collectionView.bounds.height +  collectionView.contentInset.bottom
             
             collectionView.contentOffset.y = collectionView.contentSize.height - heightOfBoundsWithSafeArea
@@ -149,11 +153,11 @@ open class ICView<View: CellableView, Cell: ViewHostingCell<View>, Settings: ICS
             if remainingSizeBellowTopFinger < heightOfBoundsWithSafeArea/2 {
                 collectionView.contentOffset.y = collectionView.contentSize.height - heightOfBoundsWithSafeArea
             } else {
-                collectionView.contentOffset.y = initialTopFingerOffsetYInContent * settings.timeScale + fingerOffsetInBounds
+                collectionView.contentOffset.y = initialTopFingerOffsetYInContent * timeScale + fingerOffsetInBounds
             }
             
             ///updating UI
-            self.layout.setupUIParams()
+            self.layout.setupUIParams(hourHeight: self.layout.defaultHourHeight * timeScale)
         case .ended, .cancelled:
             collectionView.isScrollEnabled = true
             break

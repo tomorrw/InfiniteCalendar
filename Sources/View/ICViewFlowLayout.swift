@@ -92,11 +92,6 @@ open class ICViewFlowLayout<Settings: ICSettings>: UICollectionViewFlowLayout {
         return currentSettings.datePosition == .left && currentSettings.numOfDays == 1
     }
     
-    /// Zoom scale
-    private var timeScale: CGFloat {
-        return currentSettings.timeScale
-    }
-    
     /// To fix timeHeaderBackground height size,  If use `.edgesIgnoringSafeArea()`
     var safeAreaInsets: UIEdgeInsets? {
         UIApplication.shared.connectedScenes
@@ -821,7 +816,7 @@ extension ICViewFlowLayout {
 extension ICViewFlowLayout {
     // MARK: UI, Layout
     public func setupUIParams(hourHeight: CGFloat? = nil, timeHeaderWidth: CGFloat? = nil, dateHeaderHeight: CGFloat? = nil) {
-        self.hourHeight = (hourHeight ?? defaultHourHeight) * timeScale
+        self.hourHeight = hourHeight ?? defaultHourHeight
         self.dateHeaderHeight = dateHeaderHeight ?? defaultDateHeaderHeight
         self.timeHeaderWidth = timeHeaderWidth ?? defaultTimeHeaderWidth
     }
