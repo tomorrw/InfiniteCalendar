@@ -17,13 +17,11 @@ class CustomSettings: ICSettings {
     @Published public var initDate: Date = Date()
     @Published public var scrollType: ScrollType = .pageScroll
     @Published public var moveTimeMinInterval: Int = 15
-    @Published public var timeScale: CGFloat = 1
-    @Published public var timeScaleRange: ClosedRange<CGFloat> = (0.8...6)
     @Published public var timeRange: (startTime: Int, endTime: Int) = (1, 23)
     @Published public var withVibrateFeedback: Bool = true
     @Published public var datePosition: ICViewUI.DatePosition = .left
     @Published public var backgroundColor:UIColor = .systemBackground
-
+    @Published public var isZoomable: Bool = true
     required public init() {}
     
     init(numOfDays: Int, setDate: Date) {
